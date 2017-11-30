@@ -17,7 +17,9 @@ $app['twig'] = $app->extend('twig', function ($twig, $app) {
     return $twig;
 });
 
+
 // SERVICES/MODELS pour chaque DAO
+
 $app['users.dao'] = function($app){
     return new \DAO\UserDao($app['pdo']);
 };
