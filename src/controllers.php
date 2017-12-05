@@ -8,6 +8,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 //Request::setTrustedProxies(array('127.0.0.1'));
 
+require __DIR__.'/controllers_admin.php';
+
 $app->before(function() use ($app) {
     $token = $app['security.token_storage']->getToken();
     

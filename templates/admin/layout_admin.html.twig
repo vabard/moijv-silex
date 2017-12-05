@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{% block title 'Admin' %}</title>
+    </head>
+    <body>
+        <h1>{{ block ('title') }}</h1>
+       
+        {% if app.user %}
+            <div>
+                {{ app.user.username }}<br>
+                <a href="{{ path('admin_logoutadmin') }}">Déconnexion</a>
+            </div>
+        {% endif %}
+        
+        <div>
+            <a href="{{ path('admin_userlist') }}">List des utilisateurs</a>
+        </div>
+        <div class="content">
+        {% block content %}{% endblock %}
+        </div>
+    </body>
+</html>

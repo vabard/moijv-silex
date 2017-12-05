@@ -7,9 +7,10 @@ use Silex\Provider\ServiceControllerServiceProvider;
 use Silex\Provider\HttpFragmentServiceProvider;
 use Silex\Provider\FormServiceProvider;
 use Silex\Provider\ValidatorServiceProvider;
+use App\CustomApp;
 
 
-$app = new Application();
+$app = new CustomApp();
 $app->register(new ServiceControllerServiceProvider());
 $app->register(new AssetServiceProvider());
 $app->register(new TwigServiceProvider());
@@ -60,6 +61,26 @@ $app->register(new Silex\Provider\SessionServiceProvider()); // pour fournir la 
 // création de l'espace protégé
 $app->register(new Silex\Provider\SecurityServiceProvider(), array(
     'security.firewalls' => [
+        // On met firewall Admin AVANT ce de Front (questions de priorité)
+        'admin' => array(// firewall pour backoffice
+            'pattern' => '^/admin/',
+            'http' => true,
+            'anonymous' => false,
+            'form' => array(
+                'login_path' => '/loginadmin', 
+                'check_path' => '/admin/login_check',
+                'always_use_default_target_path' => true, // pour la rédirection apres login
+                'default_target_path' => '/admin/dashboard' // pour la rédirection apres login
+            ),
+            'logout' => array(
+                'logout_path' => '/admin/logoutadmin', 
+                'invalidate_session' => true
+            ),
+            'users' => function () use ($app) {
+                return $app['admins.dao'];
+            }
+        ),
+
         'front' => array( // firewall pour le frontoffice
             'pattern' => '^/', // correspond a toutes les routes (par contre pour backoffice on ajoute \admin ou \back
             'http' => true,
@@ -70,14 +91,6 @@ $app->register(new Silex\Provider\SecurityServiceProvider(), array(
                 return $app['users.dao'];
             }
             
-        ),
-        'admin' => array(// firewall pour backoffice
-            'pattern' => '^/admin/',
-            'http' => true,
-            'form' => array('login_path' => '/loginadmin', 'check_path' => '/admin/login_check'),
-            'users' => function () use ($app) {
-                return $app['admins.dao'];
-            }
         ),
     ]
 ));
