@@ -8,8 +8,26 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 //Request::setTrustedProxies(array('127.0.0.1'));
 
+$app->before(function() use ($app) {
+    $token = $app['security.token_storage']->getToken();
+    
+    if($token){
+        $user = $token->getUser();
+    } else {
+        $user = null;
+    }
+    
+    if(is_string($user)){
+        $user = null;
+    }    
+
+    $app['user'] = $user;
+});
+
 $app->get('/', function () use ($app) {
-    return $app['twig']->render('index.html.twig', array());
+    
+    return $app['twig']->render('index.html.twig');
+    
 })
 ->bind('homepage')
 ;
@@ -20,7 +38,9 @@ $app->get('/login', function(Request $request) use ($app) {
         'error'         => $app['security.last_error']($request),
         'last_username' => $app['session']->get('_security.last_username'),
     ));
-});
+})
+->bind('login')
+;
 
 // les données sont stockés dans $request
 $app->match('/register', function(Request $request) use ($app){
@@ -50,6 +70,7 @@ $app->match('/register', function(Request $request) use ($app){
         
         // on utilise une methode de la classe SimpleDAO pour enregistrer notre user dans bdd
         $app['users.dao']->save($user); 
+        return $app->redirect($app['url_generator']->generate('login'));
         
     }
     
@@ -57,6 +78,7 @@ $app->match('/register', function(Request $request) use ($app){
     
     return $app['twig']->render('register.html.twig', ['form' => $formView]);
 })
+->bind('register')
 ->method('GET|POST')
 ;
 

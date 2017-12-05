@@ -22,7 +22,7 @@
         "symfony/translation": "~2.8|^3.0",
         "symfony/twig-bridge": "~2.8|^3.0",
         "symfony/validator": "~2.8|^3.0",
-        "Cevantime/simpledao": "@dev"
+        "Cevantime/Simpledao": "@dev"
     },
     "autoload": {
         "psr-0": { "": "src/" }

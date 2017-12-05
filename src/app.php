@@ -27,6 +27,10 @@ $app['users.dao'] = function($app){
     return new \DAO\UserDao($app['pdo']);
 };
 
+$app['admins.dao'] = function($app){
+    return new \DAO\AdminDao($app['pdo']);
+};
+
 $app['categories.dao'] = function($app){
     return new \DAO\CategoryDao($app['pdo']);
 };
@@ -61,10 +65,20 @@ $app->register(new Silex\Provider\SecurityServiceProvider(), array(
             'http' => true,
             'anonymous' => true, //on peut utiliser notre site sans se connecter (par contre il faut enlever cette ligne pour backoffice - donc pour les admin)
             'form' => array('login_path' => '/login', 'check_path' => '/login_check'), // configuration de formulaire de connexion
+            'logout' => array('logout_path' => '/logout', 'invalidate_session' => true),
             'users' => function () use ($app){
                 return $app['users.dao'];
             }
-        )
+            
+        ),
+        'admin' => array(// firewall pour backoffice
+            'pattern' => '^/admin/',
+            'http' => true,
+            'form' => array('login_path' => '/loginadmin', 'check_path' => '/admin/login_check'),
+            'users' => function () use ($app) {
+                return $app['admins.dao'];
+            }
+        ),
     ]
 ));
         

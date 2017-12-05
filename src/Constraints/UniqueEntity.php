@@ -9,7 +9,7 @@ use Symfony\Component\Validator\Constraint;
  */
 class UniqueEntity extends Constraint
 {
-    public $message = 'The username already exists';
+    public $message = 'The {{column}} already exists';
     
     /**
      * Nom de la colonne
