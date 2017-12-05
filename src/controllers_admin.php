@@ -1,6 +1,7 @@
 <?php
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 
 // ESPACE LOGIN POUR LES ADMINS
@@ -65,23 +66,14 @@ $adminGroup->match('/useredit/{id}', function (Request $request, $id) use ($app)
     
     $form = $app['form.factory']->createBuilder(\FormType\UserType::class, $user)
             ->remove('password')//on enlève le champs password car l'admin n'a pas d'acces aux mdp des user
+            ->add('submit', SubmitType::class, [
+                'label' => 'Enregistrer'
+            ])
             ->getForm();
     
     $form->handleRequest($request); // gerer - etape de validation
     
     if($form->isValid()){ // si tous les contraintes sont respéctés
-        
-        //creation de grain de sel
-        $salt = md5(time());
-        $user->setSalt($salt); // on la stock dans notre objet
-        
-        // encodage du password
-        $encodedPassword = $app['security.encoder_factory']
-                ->getEncoder($user) //recupere notre encoder personalisé pour chaque user
-                ->encodePassword($user->getPassword(), $user->getSalt()); //encodage avec le sel
-        
-        // on stock notre mdp encodé dans notre objet
-        $user->setPassword($encodedPassword);
         
         // on utilise une methode de la classe SimpleDAO pour enregistrer notre user dans bdd
         $app['users.dao']->save($user); 

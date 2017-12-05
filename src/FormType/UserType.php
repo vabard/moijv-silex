@@ -22,13 +22,15 @@ class UserType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         global $app;
-        $builder->add('username', TextType::class, [
+        $builder
+        ->add('username', TextType::class, [
             'constraints' => [
                 new Assert\NotBlank(), 
                 new Assert\Length(['min' => 2, 'max' => 50]),
                 new \Constraints\UniqueEntity([
                     'field' => 'username',
-                    'dao' => $app['users.dao']
+                    'dao' => $app['users.dao'],
+                    'groups' => ['registration']
                 ])
             ],
             'label' => 'Nom d\'utilisateur'
@@ -39,7 +41,8 @@ class UserType extends AbstractType
                 new Assert\Email(),
                 new \Constraints\UniqueEntity([
                     'field' => 'email',
-                    'dao' => $app['users.dao']
+                    'dao' => $app['users.dao'],
+                    'groups' => ['registration']
                 ])
             ],
             'label' => 'Adresse mail'
@@ -75,17 +78,14 @@ class UserType extends AbstractType
                 'label' => 'Mot de passe de confirmation'
             ]
         ])
-        
-        ->add('submit', SubmitType::class, [
-            'label' => 'Envoyer'
-        ])
         ;
     }
     
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-           'data_class' => \Entity\User::class 
+           'data_class' => \Entity\User::class,
+           'validation_groups' => ['edition']
         ]);
     }
 }
